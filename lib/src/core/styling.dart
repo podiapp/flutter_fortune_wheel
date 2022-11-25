@@ -21,13 +21,26 @@ class FortuneItemStyle {
   /// The text style to use within a [FortuneItem]
   final TextStyle textStyle;
 
+  /// (Optional) The gradient show in each slice, invalidates the [color].
+  final Gradient? gradient;
+
+  /// The ratio of the circle used to draw the slice.
+  final double circleRatio;
+
+  /// The axis of the child in the circular fortune wheel.
+  final Axis axis;
+
   const FortuneItemStyle({
     this.color = Colors.white,
     this.borderColor = Colors.black,
     this.borderWidth = 1.0,
+    this.circleRatio = 1.0,
+    this.axis = Axis.vertical,
+    this.gradient,
     this.textAlign = TextAlign.start,
     this.textStyle = const TextStyle(),
-  });
+  }) : assert(circleRatio > 0 && circleRatio <= 1,
+            "circleRatio must be between 0 and 1");
 
   /// Creates an opinionated disabled style based on the current [ThemeData].
   FortuneItemStyle.disabled(ThemeData theme, {double opacity = 0.0})

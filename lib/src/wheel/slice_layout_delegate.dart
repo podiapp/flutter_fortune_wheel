@@ -7,13 +7,13 @@ enum _SliceSlot {
 
 class _CircleSliceLayoutDelegate extends MultiChildLayoutDelegate {
   final double angle;
+  final double ratio;
 
-  _CircleSliceLayoutDelegate(this.angle);
+  _CircleSliceLayoutDelegate(this.angle, this.ratio);
 
   @override
   void performLayout(Size size) {
     late Size sliceSize;
-    Size childSize;
 
     if (hasChild(_SliceSlot.slice)) {
       sliceSize = layoutChild(
@@ -24,12 +24,12 @@ class _CircleSliceLayoutDelegate extends MultiChildLayoutDelegate {
     }
 
     if (hasChild(_SliceSlot.child)) {
-      childSize = layoutChild(
+      final childSize = layoutChild(
         _SliceSlot.child,
         BoxConstraints.loose(size),
       );
 
-      final topRectVector = _math.Point(sliceSize.width / 2, 0.0);
+      final topRectVector = _math.Point(sliceSize.width * (1 - ratio / 2), 0.0);
       final halfAngleVector = topRectVector.rotate(angle / 2);
 
       positionChild(
@@ -44,6 +44,6 @@ class _CircleSliceLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_CircleSliceLayoutDelegate oldDelegate) {
-    return angle != oldDelegate.angle;
+    return angle != oldDelegate.angle || ratio != oldDelegate.ratio;
   }
 }

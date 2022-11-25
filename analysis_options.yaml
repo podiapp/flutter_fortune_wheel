@@ -6,3 +6,6 @@ analyzer:
 linter:
   rules:
     public_member_api_docs: false
+    one_member_abstracts: false
+    avoid_classes_with_only_static_members: false
+    avoid_types_on_closure_parameters: false

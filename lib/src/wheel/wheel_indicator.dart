@@ -1,40 +1,23 @@
 part of 'wheel.dart';
 
 Offset _getOffset(Alignment alignment, Offset margins) {
-  assert(
-      <Alignment>[
-        Alignment.topCenter,
-        Alignment.bottomCenter,
-        Alignment.centerLeft,
-        Alignment.centerRight,
-        Alignment.center,
-      ].contains(alignment),
+  assert(alignment.x == 0 || alignment.y == 0,
       'Alignments on the diagonals are not yet supported.');
 
-  if (alignment == Alignment.topCenter) {
-    return margins.scale(0, 1);
-  }
-  if (alignment == Alignment.bottomCenter) {
-    return margins.scale(0, -1);
-  }
-  if (alignment == Alignment.centerLeft) {
-    return margins.scale(1, 0);
-  }
-  if (alignment == Alignment.centerRight) {
-    return margins.scale(-1, 0);
-  }
   if (alignment == Alignment.center) {
-    return Offset(0, 0);
+    return Offset.zero;
   }
-
-  throw ArgumentError('Alignments on the diagonals are not yet supported');
+  return margins.scale(-alignment.x, -alignment.y);
 }
 
 double _getAngle(Alignment alignment) {
-  if (alignment == Alignment.center || alignment == Alignment.topCenter) {
+  assert(alignment.x == 0 || alignment.y == 0,
+      'Alignments on the diagonals are not yet supported.');
+
+  if ([Alignment.center, Alignment.topCenter].contains(alignment)) {
     return 0;
   }
-  if (alignment == Alignment.bottomCenter) {
+  if (alignment.x == 0) {
     return _math.pi;
   }
   if (alignment == Alignment.centerLeft) {

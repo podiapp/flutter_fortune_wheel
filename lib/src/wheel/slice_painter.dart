@@ -5,12 +5,16 @@ part of 'wheel.dart';
 class _CircleSlicePainter extends CustomPainter {
   final Color fillColor;
   final Color? strokeColor;
+  final Gradient? gradient;
   final double strokeWidth;
   final double angle;
+  final double ratio;
 
   const _CircleSlicePainter({
     required this.fillColor,
     this.strokeColor,
+    this.gradient,
+    this.ratio = 1,
     this.strokeWidth = 1,
     this.angle = _math.pi / 2,
   }) : assert(angle > 0 && angle < 2 * _math.pi);
@@ -18,15 +22,17 @@ class _CircleSlicePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final radius = _math.min(size.width, size.height);
-    final path = _CircleSlice.buildSlicePath(radius, angle);
+    final path = _CircleSlice.buildSlicePath(radius, angle, ratio);
 
+    final gradientPaint = Paint()
+      ..shader =
+          gradient?.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+    final normalPaint = Paint()
+      ..color = fillColor
+      ..style = PaintingStyle.fill;
     // fill slice area
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = fillColor
-        ..style = PaintingStyle.fill,
-    );
+    canvas.drawPath(path, gradient != null ? gradientPaint : normalPaint);
 
     // draw slice border
     if (strokeWidth > 0) {

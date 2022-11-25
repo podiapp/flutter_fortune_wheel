@@ -1,18 +1,18 @@
 part of 'wheel.dart';
 
 class _CircleSlice extends StatelessWidget {
-  static Path buildSlicePath(double radius, double angle) {
+  static Path buildSlicePath(double radius, double angle, [double ratio = 1]) {
+    final startPoint = Offset(radius * (1 - ratio), 0);
     return Path()
-      ..moveTo(0, 0)
+      ..moveTo(startPoint.dx, startPoint.dy)
+      // ..moveTo(0, 0)
       ..lineTo(radius, 0)
-      ..arcTo(
-          Rect.fromCircle(
-            center: Offset(0, 0),
-            radius: radius,
-          ),
-          0,
-          angle,
-          false)
+      ..arcTo(Rect.fromCircle(center: const Offset(0, 0), radius: radius), 0,
+          angle, false)
+      ..relativeLineTo(
+          -cos(angle) * radius * ratio, -sin(angle) * radius * ratio)
+      ..arcToPoint(startPoint,
+          radius: Radius.circular(radius * (1 - ratio)), clockwise: false)
       ..close();
   }
 
@@ -21,6 +21,8 @@ class _CircleSlice extends StatelessWidget {
   final Color fillColor;
   final Color strokeColor;
   final double strokeWidth;
+  final Gradient? gradient;
+  final double ratio;
 
   const _CircleSlice({
     Key? key,
@@ -28,6 +30,8 @@ class _CircleSlice extends StatelessWidget {
     required this.fillColor,
     required this.strokeColor,
     this.strokeWidth = 1,
+    required this.ratio,
+    this.gradient,
     required this.angle,
   })  : assert(radius > 0),
         super(key: key);
@@ -41,6 +45,8 @@ class _CircleSlice extends StatelessWidget {
         painter: _CircleSlicePainter(
           angle: angle,
           fillColor: fillColor,
+          gradient: gradient,
+          ratio: ratio,
           strokeColor: strokeColor,
           strokeWidth: strokeWidth,
         ),
@@ -53,10 +59,12 @@ class _CircleSliceLayout extends StatelessWidget {
   final Widget? child;
   final _CircleSlice slice;
   final GestureHandler? handler;
+  final Axis axis;
 
   const _CircleSliceLayout({
     Key? key,
     required this.slice,
+    required this.axis,
     this.child,
     this.handler,
   }) : super(key: key);
@@ -114,9 +122,9 @@ class _CircleSliceLayout extends StatelessWidget {
         onTertiaryTapDown: handler?.onTertiaryTapDown,
         onTertiaryTapUp: handler?.onTertiaryTapUp,
         child: ClipPath(
-          clipper: _CircleSliceClipper(slice.angle),
+          clipper: _CircleSliceClipper(slice.angle, slice.ratio),
           child: CustomMultiChildLayout(
-            delegate: _CircleSliceLayoutDelegate(slice.angle),
+            delegate: _CircleSliceLayoutDelegate(slice.angle, slice.ratio),
             children: [
               LayoutId(
                 id: _SliceSlot.slice,
@@ -126,7 +134,8 @@ class _CircleSliceLayout extends StatelessWidget {
                 LayoutId(
                   id: _SliceSlot.child,
                   child: Transform.rotate(
-                    angle: slice.angle / 2,
+                    angle:
+                        slice.angle / 2 + (axis == Axis.vertical ? 0 : pi / 2),
                     child: child,
                   ),
                 ),

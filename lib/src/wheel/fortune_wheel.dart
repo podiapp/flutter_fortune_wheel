@@ -174,6 +174,7 @@ class FortuneWheel extends HookWidget implements FortuneWidget {
   @override
   Widget build(BuildContext context) {
     final rotateAnimCtrl = useAnimationController(duration: duration);
+
     final rotateAnim = CurvedAnimation(parent: rotateAnimCtrl, curve: curve);
 
     Future<void> animate() async {
